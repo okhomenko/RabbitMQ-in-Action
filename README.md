@@ -11,3 +11,8 @@ Notes on RabbitMQ-in-Action book
 
 There will be messages, and there will be rabbits, and all will be revealed. (Alexis Richardson)
 
+## Preface
+
+- Why messaging: separate system for spam filtering
+- Why messaging: needed to consume same messages by different systems
+- Why messaging: solves basic problems of distributing data, when trygin to scale software
