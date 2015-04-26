@@ -1,2 +1,4 @@
+.DS_Store
 rmq
 erl_crash.dump
+node_modules
