@@ -205,3 +205,35 @@ VHosts and permissions can't be managed by AMQP protocol only with *rabbitctl* t
 - add_vhost [name]
 - list_vhosts
 - delete_vhost [name]
+
+### Durability, persistency
+
+When we restart RMQ - all exchanges, queues, messages don't survive. All because *durable* param. It defaults to *false* when create exchanges, queues. When true - should be re-created after crash/reboot RMQ
+
+Message need to be marked with flag delivery mode = 2, published to durable exchange and consumed by durable queue.
+
+Persistent messages are written to the disk inside persistency log.
+If message sent to durable exchange but arrived to non-durable queue - message won't survive reboot (saved to log => arrived queue (remove from log)).
+When consumed from durable queue and acknowledged - message marks for garbage collection.
+
+For persistent messages we pay with performance (10x and more).
+
+#### Issue with clusters
+
+Queues are evenly distributed across cluster (every queue only on one node). **Thus - if queue was durable and crashed: until it is restored - it is black-hole queue, because messages routed to the queue can't be delievered**
+
+**TIP** Place RMQ on SSD to use persistent messages.
+**TIP** Analyze throughput and make decision on persistency.
+**TIP** Use persistent messages only for critical messages.
+**TIP** Reply-to (request-response) pattern. Producer may wait some amount of time. If haven't get response - republish message.
+**TIP** Cluster for non-persisten messages, and pairs of active/hot-standby non-clustered servers for persistent messages (with load balancers). It keeps us from persistency black-holed issue.
+
+#### AMQP Transactions
+
+To ensure that broker saved published message to persistent log. It has performance issue, reducing throughput by factor 2-10x
+
+- channel in transaction mode: publish command and following commands (0+) and *commit* transaction. If publish success - execute other commands, fail - don't execute other commands.
+
+#### Publisher confirms
+
+- channel in confirm mode (can't be turned off without recreation): on publish every message get ID, when message delievered to queue - channel will issue publisher confirm to producer 
