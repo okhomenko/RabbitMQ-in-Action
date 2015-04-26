@@ -186,4 +186,22 @@ There are four types of exchanges: direct, fanout, topic, headers.
 **(broker implements default direct exchange with empty string ('') name. When queue is declared  - it is automatically bound to that default exchange with routign key equal to name of queue)
 **TIP**. Often in simple application enough default exchange that works as one-to-one pattern without need to declare another exchange.
 - *fanout* - multicast message to bound queues. Pattern: deliever to all attached queues. Use case: user send signup request. we want to send him welcome message, log this request and send approval request to administrator.
-- *topic* - allows messages from different exchange arrives to one queue. You can bind queues using wildcards "warn.user", "*.user", "#" 
+- *topic* - allows messages from different exchange arrives to one queue. You can bind queues using wildcards "warn.user", "*.user", "#"
+
+### Vhosts (multiple tenants) and permissions
+
+Virtual message broker (mini-RMQ server with own queues, exchanges, bindings, permissions). Obvious use case: different apps requires its own broker instance.
+
+Broker comes with default vhost and guest|guest user.
+
+In RMQ permissions are per-vhost
+
+**TIP**. Recommends to identify common functionality groups in infrastructure (such as logging) and give each one its own vhost.
+
+VHosts and permissions can't be managed by AMQP protocol only with *rabbitctl* tool
+
+#### rabbitmqctl vhosts
+- rabbitmqctl -n rabbit@localhost, rabbit - name of erlang app name
+- add_vhost [name]
+- list_vhosts
+- delete_vhost [name]
