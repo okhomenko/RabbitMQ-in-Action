@@ -184,7 +184,9 @@ There are four types of exchanges: direct, fanout, topic, headers.
 - *headers* type operates the same way as direct but bases on header in message instead of routing key. **It is very low performance**
 - *direct* - if routing key matches - deliever to corresponding queue.
 **(broker implements default direct exchange with empty string ('') name. When queue is declared  - it is automatically bound to that default exchange with routign key equal to name of queue)
-**TIP**. Often in simple application enough default exchange that works as one-to-one pattern without need to declare another exchange.
+
+**TIP** Often in simple application enough default exchange that works as one-to-one pattern without need to declare another exchange.
+
 - *fanout* - multicast message to bound queues. Pattern: deliever to all attached queues. Use case: user send signup request. we want to send him welcome message, log this request and send approval request to administrator.
 - *topic* - allows messages from different exchange arrives to one queue. You can bind queues using wildcards "warn.user", "*.user", "#"
 
@@ -222,10 +224,10 @@ For persistent messages we pay with performance (10x and more).
 
 Queues are evenly distributed across cluster (every queue only on one node). **Thus - if queue was durable and crashed: until it is restored - it is black-hole queue, because messages routed to the queue can't be delievered**
 
-**TIP** Place RMQ on SSD to use persistent messages.
-**TIP** Analyze throughput and make decision on persistency.
-**TIP** Use persistent messages only for critical messages.
-**TIP** Reply-to (request-response) pattern. Producer may wait some amount of time. If haven't get response - republish message.
+**TIP** Place RMQ on SSD to use persistent messages. 
+**TIP** Analyze throughput and make decision on persistency. 
+**TIP** Use persistent messages only for critical messages. 
+**TIP** Reply-to (request-response) pattern. Producer may wait some amount of time. If haven't get response - republish message. 
 **TIP** Cluster for non-persisten messages, and pairs of active/hot-standby non-clustered servers for persistent messages (with load balancers). It keeps us from persistency black-holed issue.
 
 #### AMQP Transactions
@@ -236,4 +238,7 @@ To ensure that broker saved published message to persistent log. It has performa
 
 #### Publisher confirms
 
-- channel in confirm mode (can't be turned off without recreation): on publish every message get ID, when message delievered to queue - channel will issue publisher confirm to producer 
+- channel in confirm mode (can't be turned off without recreation): on publish every message get ID, when message delievered to queue - channel will issue publisher confirm to producer. confirms are asynchronous. uses callback mechanism. (*nack* message if wasn't delievered)
+
+### Example
+
