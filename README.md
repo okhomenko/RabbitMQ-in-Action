@@ -166,3 +166,24 @@ Both producers and consumers should declare queues.
 - messages wait in queues to be consumed
 - good tool for load-balancing (round-robin)
 - final endpoint for messages in RMQ
+
+#### Exchanges and bindings
+
+This is how messages get to queues. We send to exchange, and exchange decides to which queue send message by *routing keys*.
+
+Queue is bound to exchange by routing key.
+
+When send message - we always send routing key (even blank key). If broker can't match binding pattern - message black-holed.
+
+*Why not just send directly to queue? Because usually we want to do more than one action on the same message. And thus we want one message sent to one exchange - to be delievered to multiple queues*
+
+#### How broker deliever to multiple exchanges? 
+
+There are four types of exchanges: direct, fanout, topic, headers.
+
+- *headers* type operates the same way as direct but bases on header in message instead of routing key. **It is very low performance**
+- *direct* - if routing key matches - deliever to corresponding queue.
+**(broker implements default direct exchange with empty string ('') name. When queue is declared  - it is automatically bound to that default exchange with routign key equal to name of queue)
+**TIP**. Often in simple application enough default exchange that works as one-to-one pattern without need to declare another exchange.
+- *fanout* - multicast message to bound queues. Pattern: deliever to all attached queues. Use case: user send signup request. we want to send him welcome message, log this request and send approval request to administrator.
+- *topic* - allows messages from different exchange arrives to one queue. You can bind queues using wildcards "warn.user", "*.user", "#" 
